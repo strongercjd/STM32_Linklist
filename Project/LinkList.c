@@ -3,7 +3,7 @@
 * @file LinkList.c
 * 
 * @author strongercjd (strongercjd@163.com)
-* @brief Á´±í¹ÜÀí
+* @brief é“¾è¡¨ç®¡ç†
 * @version 0.1
 * @date 2020-12-08
 * 
@@ -14,57 +14,77 @@
 
 #include "LinkList.h"
 
-Area_List_Inf_Typedef *Head_Area_List; //Á´±íµÄÍ·Ö¸Õë
+Area_List_Inf_Typedef *Head_Area_List; //é“¾è¡¨çš„å¤´æŒ‡é’ˆ
 
 /**
-* @brief ¶¯Ì¬ÇøÁ´±í³õÊ¼»¯
+* @brief åŠ¨æ€åŒºé“¾è¡¨åˆå§‹åŒ–
 * 
 * 
 * @return int 
 */
 int Area_List_Init(void)
 {
-  //ÉêÇëÁ´±íÀàĞÍ´óĞ¡µÄ¿Õ¼ä£¬²¢ÈÃÍ·Ö¸ÕëÖ¸ÏòËü
-  Head_Area_List = (Area_List_Inf_Typedef*)malloc(sizeof(Area_List_Inf_Typedef));
-  if(Head_Area_List == NULL) 
-    return false;
-  
-  //Í¬Ê±Òª±ê¼ÇÏÂÒ»¸öĞÅÏ¢Îª¿Õ
-  Head_Area_List->next_Area_Inf = NULL;
+  // åˆå§‹åŒ–å¤´æŒ‡é’ˆä¸ºç©º
+  Head_Area_List = NULL;
   return true;
 }
 
 /**
-* @brief ÔÚÁ´±íÄ©Î²Ôö¼ÓÒ»¸öÇøÓò²ÎÊı
+* @brief åœ¨é“¾è¡¨æœ«å°¾å¢åŠ ä¸€ä¸ªåŒºåŸŸå‚æ•°
 * 
-* @param Area_Inf Ôö¼ÓµÄÇøÓòÇø²ÎÊıÖ¸Õë
+* @param Area_Inf å¢åŠ çš„åŒºåŸŸåŒºå‚æ•°æŒ‡é’ˆ
 * @return int 
 */
 int Add_Area_ToList(Area_Inf_Typedef *Area_Inf)
 {
+  if (Head_Area_List == NULL) {  // å¤„ç†ç©ºé“¾è¡¨çš„æƒ…å†µ
+    Head_Area_List = (Area_List_Inf_Typedef*)malloc(sizeof(Area_List_Inf_Typedef));
+    if (Head_Area_List == NULL)
+      return false;
+    
+    Head_Area_List->Area_Inf = (Area_Inf_Typedef*)malloc(sizeof(Area_Inf_Typedef));
+    if (Head_Area_List->Area_Inf == NULL) {
+      free(Head_Area_List);
+      Head_Area_List = NULL;
+      return false;
+    }
+    
+    memcpy(Head_Area_List->Area_Inf, Area_Inf, sizeof(Area_Inf_Typedef));
+    Head_Area_List->Area_Inf->Area_Data = (uint8_t*)malloc(Area_Inf->data_len);
+    if (Head_Area_List->Area_Inf->Area_Data == NULL) {
+      free(Head_Area_List->Area_Inf);
+      free(Head_Area_List);
+      Head_Area_List = NULL;
+      return false;
+    }
+    memcpy(Head_Area_List->Area_Inf->Area_Data, Area_Inf->Area_Data, Area_Inf->data_len);
+    Head_Area_List->next_Area_Inf = NULL;
+    return true;
+  }
+
   Area_List_Inf_Typedef *p = Head_Area_List;
-  while(p->next_Area_Inf!=NULL)
+  while(p->next_Area_Inf != NULL)
   {
     p = p->next_Area_Inf;
   }
   
-  //ÏÈÉêÇëÁ´±í½á¹¹ÌåµÄ¿Õ¼ä£¬ÒòÎªºóĞø»¹Òª¼ÌĞøÔö¼Ó
+  //å…ˆç”³è¯·é“¾è¡¨ç»“æ„ä½“çš„ç©ºé—´ï¼Œå› ä¸ºåç»­è¿˜è¦ç»§ç»­å¢åŠ 
   p->next_Area_Inf =  (Area_List_Inf_Typedef*)malloc(sizeof(Area_List_Inf_Typedef));
   if(p->next_Area_Inf == NULL) 
-    return false;//ÉêÇë²»µ½ÄÚ´æ£¬·µ»ØÊ§°Ü
+    return false;//ç”³è¯·ä¸åˆ°å†…å­˜ï¼Œè¿”å›å¤±è´¥
   
-  //Ö¸Ïò¸Õ¸ÕÉêÇëµÄ¿Õ¼ä£¬²¢ÎªĞèÒª´æ·ÅµÄ¶¯Ì¬ÇøĞÅÏ¢ÉêÇë¶ÔÓ¦µÄÄÚ´æ
+  //æŒ‡å‘åˆšåˆšç”³è¯·çš„ç©ºé—´ï¼Œå¹¶ä¸ºéœ€è¦å­˜æ”¾çš„åŠ¨æ€åŒºä¿¡æ¯ç”³è¯·å¯¹åº”çš„å†…å­˜
   p = p->next_Area_Inf;
   
   p->Area_Inf = (Area_Inf_Typedef*)malloc(sizeof(Area_Inf_Typedef));
   if(p->Area_Inf == NULL) 
   {
-    free(p);//ÓÉÓÚÉêÇëÊ§°Ü£¬ÏÈÇ°ÉêÇëµÄÁ´±í¿Õ¼äÒ²ÒªÊÍ·Å
+    free(p);//ç”±äºç”³è¯·å¤±è´¥ï¼Œå…ˆå‰ç”³è¯·çš„é“¾è¡¨ç©ºé—´ä¹Ÿè¦é‡Šæ”¾
     return false;
   }    
   memcpy(p->Area_Inf,Area_Inf,sizeof(Area_Inf_Typedef));
   
-  /*¿½±´Êı¾İ*/
+  /*æ‹·è´æ•°æ®*/
   p->Area_Inf->Area_Data = (uint8_t*)malloc(Area_Inf->data_len);
   if(p->Area_Inf->Area_Data == NULL) 
   {
@@ -74,135 +94,142 @@ int Add_Area_ToList(Area_Inf_Typedef *Area_Inf)
   }
   memcpy(p->Area_Inf->Area_Data,Area_Inf->Area_Data,Area_Inf->data_len);
   
-  //±ê¼ÇÕâ¸öÁ´±íµÄÎ²²¿
+  //æ ‡è®°è¿™ä¸ªé“¾è¡¨çš„å°¾éƒ¨
   p->next_Area_Inf=NULL;
   
-  //Ìí¼Ó³É¹¦
+  //æ·»åŠ æˆåŠŸ
   return true;
 }
 
 /**
-* @brief ¸ù¾İÇøÓòIDÉ¾³ı¶¯Ì¬Çø
+* @brief æ ¹æ®åŒºåŸŸIDåˆ é™¤åŠ¨æ€åŒº
 * 
-* @param num ÇøÓòID
+* @param num åŒºåŸŸID
 * @return int 
 */
 int Delete_Area_Accordingn_ID(int num)
 {
+  if (Head_Area_List == NULL) return false;
+
   int res = false;
-  Area_List_Inf_Typedef *p = Head_Area_List;
-  
-  while(p->next_Area_Inf!=NULL)
-  {
-    Area_List_Inf_Typedef *temp = p;
-    p = p->next_Area_Inf;
-    if(p->Area_Inf->ID == num)//Æ¥Åäµ½¶ÔÓ¦µÄÖµ
-    {
-      temp->next_Area_Inf = p->next_Area_Inf;
-      //ÊÍ·ÅÄÚ´æ¿Õ¼ä 
-      free(p->Area_Inf->Area_Data);
-      free(p->Area_Inf);
-      
-      free(p);
-      
-      p=temp;
+  Area_List_Inf_Typedef *current = Head_Area_List;
+  Area_List_Inf_Typedef *prev = NULL;
+
+  while (current != NULL) {
+    if (current->Area_Inf->ID == num) {
+      if (prev == NULL) {
+        // åˆ é™¤å¤´èŠ‚ç‚¹
+        Head_Area_List = current->next_Area_Inf;
+      } else {
+        prev->next_Area_Inf = current->next_Area_Inf;
+      }
+
+      free(current->Area_Inf->Area_Data);
+      free(current->Area_Inf);
+      free(current);
       res = true;
+      break;
     }
+    prev = current;
+    current = current->next_Area_Inf;
   }
   return res;
 }
 
 /**
-* @brief ¸ù¾İÇøÓòIDÕÒµ½Á´±í
+* @brief æ ¹æ®åŒºåŸŸIDæ‰¾åˆ°é“¾è¡¨
 * 
-* @param data_p Á´±íÖ¸Õë
-* @param num    ÇøÓòID±àºÅ
+* @param data_p é“¾è¡¨æŒ‡é’ˆ
+* @param num    åŒºåŸŸIDç¼–å·
 * @return int 
 */
 int Find_Area_According_ID(Area_Inf_Typedef **data_p,int num)
 {
-  Area_List_Inf_Typedef *p =  Head_Area_List;
-  while(p->next_Area_Inf!=NULL)
+  Area_List_Inf_Typedef *p = Head_Area_List;
+  while(p != NULL)
   {
-    p = p->next_Area_Inf;
-    if(p->Area_Inf->ID == num)//Æ¥Åäµ½¶ÔÓ¦µÄÖµ
-    {
+    if(p->Area_Inf->ID == num) {
       *data_p = p->Area_Inf;
-      
       return true;
     }
+    p = p->next_Area_Inf;
   }
   return false;
 }
 
 
 /**
-* @brief É¾³ıËùÓĞÇøÓò
+* @brief åˆ é™¤æ‰€æœ‰åŒºåŸŸ
 * 
 */
 int Delete_All_Area(void)
 {
+  if (Head_Area_List == NULL) return false;
+
   int res = false;
-  Area_List_Inf_Typedef *p =  Head_Area_List;
-  while(p->next_Area_Inf!=NULL)
-  {
-    Area_List_Inf_Typedef *temp = p;
-    p = p->next_Area_Inf;
+  Area_List_Inf_Typedef *current = Head_Area_List;
+  
+  while (current != NULL) {
+    Area_List_Inf_Typedef *next = current->next_Area_Inf;
     
-    temp->next_Area_Inf = p->next_Area_Inf;
+    // é‡Šæ”¾èŠ‚ç‚¹å†…å­˜
+    if (current->Area_Inf != NULL) {
+      free(current->Area_Inf->Area_Data);
+      free(current->Area_Inf);
+    }
+    free(current);
     
-    //ÊÍ·ÅÄÚ´æ¿Õ¼ä 
-    free(p->Area_Inf->Area_Data);
-    free(p->Area_Inf);
-    free(p);
-    
-    p=temp;
-    
+    current = next;
     res = true;
-    
   }
+  
+  Head_Area_List = NULL; // é‡ç½®å¤´æŒ‡é’ˆ
   return res;
-} 
+}
 
 /**
-* @brief ´òÓ¡Á´±íĞÅÏ¢
+* @brief æ‰“å°é“¾è¡¨ä¿¡æ¯
 * 
 */
 void Printf_Area_Inf(void)
 {
+  if (Head_Area_List == NULL) {
+    printf("List is empty\r\n");
+    return;
+  }
+
   int i=0;
-  Area_List_Inf_Typedef *p =  Head_Area_List;
+  Area_List_Inf_Typedef *p = Head_Area_List;
   printf("list   ID   X   Y   Width   Height   Area_Data\r\n");
   
-  while(p->next_Area_Inf!=NULL)
+  while(p != NULL)
   {
-    p = p->next_Area_Inf;
     printf(" %d     %d    %d   %d    %d      %d      %s\r\n",i,p->Area_Inf->ID,p->Area_Inf->X,p->Area_Inf->Y,p->Area_Inf->Width,p->Area_Inf->Height,p->Area_Inf->Area_Data);
+    p = p->next_Area_Inf;
     i++;
-  }	
+  }
   printf("----------------------end-----------------------\r\n");
-} 
+}
 
 /**
-* @brief Á´±í²âÊÔº¯Êı
+* @brief é“¾è¡¨æµ‹è¯•å‡½æ•°
 * 
 */
 void list_main()
 {
   int i,j;
   Area_Inf_Typedef temp;
-  Area_Inf_Typedef **data_p;
-  
-  data_p = NULL;
-  
+  Area_Inf_Typedef *found_area = NULL;
+  Area_Inf_Typedef **data_p = &found_area;
   
   printf("------------------List test---------------------\r\n"); 
-  if(!Area_List_Init( ))
+  if(!Area_List_Init())
   {
     printf("Memory fail..\r\n");
+    return;
   }
-  
-  
+
+  // åˆ›å»ºæµ‹è¯•æ•°æ®
   for(i=0;i<5;i++)
   {
     temp.ID = i;
@@ -222,17 +249,17 @@ void list_main()
     {
       printf("Add Area %d Area_Info fail\r\n",i);
     }
+    free(temp.Area_Data); // é‡Šæ”¾ä¸´æ—¶åˆ†é…çš„å†…å­˜
   }
   
   Printf_Area_Inf();
   
   printf("\r\n-------------Delete ID of Area is 3-------------\r\n");
   Delete_Area_Accordingn_ID(3);
-  
   Printf_Area_Inf();
   
+  // æ·»åŠ æ–°åŒºåŸŸ
   temp.ID = 9;
-  
   temp.data_len = 10;
   temp.Area_Data = (uint8_t*)malloc(temp.data_len+1);
   for(j=0;j<temp.data_len;j++)
@@ -245,18 +272,23 @@ void list_main()
   {
     printf("Add Area %d info fail\r\n",temp.ID);
   }
+  free(temp.Area_Data); // é‡Šæ”¾ä¸´æ—¶åˆ†é…çš„å†…å­˜
+  
   printf("\r\n--------------Add ID of Area is 9---------------\r\n");
   Printf_Area_Inf();
   
-  Find_Area_According_ID(data_p,2);
-  temp.ID = (*data_p)->ID;
+  // æŸ¥æ‰¾åŒºåŸŸæµ‹è¯•
+  if(Find_Area_According_ID(data_p,2))
+  {
+    printf("Found area ID: %d\r\n", (*data_p)->ID);
+  }
+  else
+  {
+    printf("Area ID 2 not found\r\n");
+  }
   
+  // æ¸…ç†æµ‹è¯•ç¯å¢ƒ
   Delete_All_Area();
   printf("\r\n--------------Delete All Area-------------------\r\n");
-  
   Printf_Area_Inf();
-  
-  while(1);
 }
-
-

@@ -38,7 +38,7 @@ typedef struct Area_Inf
 typedef struct Area_List_Inf
 {
   Area_Inf_Typedef *Area_Inf;
-  struct Area_List_Inf *next_Area_Inf;  //ÓÃÓÚÖ¸ÏòÏÂÒ»¸ö
+  struct Area_List_Inf *next_Area_Inf;  //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·æŒ‡é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·ä¸€é”Ÿæ–¤æ‹·
 }Area_List_Inf_Typedef;
 
 
